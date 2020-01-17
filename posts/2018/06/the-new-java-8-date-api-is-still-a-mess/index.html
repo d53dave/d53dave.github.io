@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author" content="">
+<meta name="description" content="Do you remember how everybody was hyped about the new date and time APIs introduced in Java 8? Yes, I was hyped too, although I was using jodatime wherever I could anyway. Now this was a while back and at the time of this writing, Java 10 is out and the latest (or at least a fairly current) release is
+java version &amp;quot;10.0.1&amp;quot; 2018-04-17 Java(TM) SE Runtime Environment 18.3 (build 10." />
+<meta name="keywords" content="software engineering, computer science, programming" />
+<meta name="robots" content="noodp" />
+<meta name="theme-color" content="" />
+<link rel="canonical" href="https://d53dev.net/posts/2018/06/the-new-java-8-date-api-is-still-a-mess/" />
+
+
+    <title>
+        
+            The &#34;new&#34; Java 8 date API is still a mess :: Off The Point  — human engineer musician
+        
+    </title>
+
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.2.1/css/flag-icon.min.css" rel="stylesheet"
+    type="text/css">
+
+
+
+<link rel="stylesheet" href="/main.min.5dcefbf8102eb536dd3e2de53ffebfa58599ab2435c241a0db81728a5e015f2e.css">
+
+
+    
+        <link rel="stylesheet" type="text/css" href="https://d53dev.net/css/centering.css">
+    
+
+
+
+<meta itemprop="name" content="The &#34;new&#34; Java 8 date API is still a mess">
+<meta itemprop="description" content="Do you remember how everybody was hyped about the new date and time APIs introduced in Java 8? Yes, I was hyped too, although I was using jodatime wherever I could anyway. Now this was a while back and at the time of this writing, Java 10 is out and the latest (or at least a fairly current) release is
+java version &quot;10.0.1&quot; 2018-04-17 Java(TM) SE Runtime Environment 18.3 (build 10.">
+<meta itemprop="datePublished" content="2018-06-20T23:00:11&#43;01:00" />
+<meta itemprop="dateModified" content="2018-06-20T23:00:11&#43;01:00" />
+<meta itemprop="wordCount" content="401">
+<meta itemprop="image" content="https://d53dev.net/"/>
+
+
+
+<meta itemprop="keywords" content="untagged," /><meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://d53dev.net/"/>
+
+<meta name="twitter:title" content="The &#34;new&#34; Java 8 date API is still a mess"/>
+<meta name="twitter:description" content="Do you remember how everybody was hyped about the new date and time APIs introduced in Java 8? Yes, I was hyped too, although I was using jodatime wherever I could anyway. Now this was a while back and at the time of this writing, Java 10 is out and the latest (or at least a fairly current) release is
+java version &quot;10.0.1&quot; 2018-04-17 Java(TM) SE Runtime Environment 18.3 (build 10."/>
+
+
+
+
+
+    <meta property="article:published_time" content="2018-06-20 23:00:11 &#43;0100 &#43;0100" />
+
+
+
+
+
+
+
+
+    </head>
+
+    <body class="dark-theme">
+        <div class="container">
+            <header class="header">
+    <span class="header__inner">
+        <a href="/" style="text-decoration: none;">
+    <div class="logo">
+        
+            <span class="logo__mark">></span>
+            <span class="logo__text">./off-the-point.sh</span>
+            <span class="logo__cursor" style=""></span>
+        
+    </div>
+</a>
+
+
+        <span class="header__right">
+            
+                <nav class="menu">
+    <ul class="menu__inner"><li><a href="https://d53dev.net/posts">Blog</a></li>
+    </ul>
+</nav>
+
+                <span class="menu-trigger">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                    </svg>
+                </span>
+            
+
+            <span class="theme-toggle unselectable"><svg class="theme-toggler" width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M22 41C32.4934 41 41 32.4934 41 22C41 11.5066 32.4934 3 22
+  3C11.5066 3 3 11.5066 3 22C3 32.4934 11.5066 41 22 41ZM7 22C7
+  13.7157 13.7157 7 22 7V37C13.7157 37 7 30.2843 7 22Z"/>
+</svg>
+</span>
+        </span>
+    </span>
+</header>
+
+
+            <div class="content">
+                
+    <main class="post">
+
+        <div class="post-info">
+            <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>2 minutes
+
+            
+
+            </p>
+        </div>
+
+        <article>
+            <h1 class="post-title">
+                <a href="https://d53dev.net/posts/2018/06/the-new-java-8-date-api-is-still-a-mess/">The &ldquo;new&rdquo; Java 8 date API is still a mess</a>
+            </h1>
+
+            
+
+            <div class="post-content">
+                <p>Do you remember how everybody was hyped about the new date and time APIs introduced in Java 8? Yes, I was hyped too, although I was using <em>jodatime</em> wherever I could anyway. Now this was a while back and at the time of this writing, Java 10 is out and the latest (or at least a fairly current) release is</p>
+<pre><code class="language-console" data-lang="console">java version &quot;10.0.1&quot; 2018-04-17
+Java(TM) SE Runtime Environment 18.3 (build 10.0.1+10)
+Java HotSpot(TM) 64-Bit Server VM 18.3 (build 10.0.1+10, mixed mode)
+</code></pre><p>so we all have even saner APIs to deal with dates and times, right? <strong>Wrong.</strong></p>
+<p><img src="https://media.giphy.com/media/3oFyDpijVlI0bSoB8Y/giphy.gif#center" alt="Vince Vaughn screaming &ldquo;erroneous&rdquo;"></p>
+<h2 id="the-unsuspecting-dev">The unsuspecting Dev</h2>
+<p>Today I was configuring some timeouts at work, and I though to myself</p>
+<blockquote>
+<p>Why not be really explicit about what values and units are used?</p>
+</blockquote>
+<p>It is 2018 and I don’t want or need to see lines like</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">long</span> timeoutmillis <span style="color:#f92672">=</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">long</span><span style="color:#f92672">)</span> 420_000 <span style="color:#f92672">*</span> COMPANY_INTERNAL_TIME_FACTOR <span style="color:#f92672">*</span> 1e<span style="color:#f92672">-</span>3 <span style="color:#f92672">-</span> 1
+</code></pre></div><p>so, with the help of my trusty IDE autocompletion, I arrived at something much more pleasing to the eye:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">Duration<span style="color:#f92672">.</span><span style="color:#a6e22e">of</span><span style="color:#f92672">(</span>90<span style="color:#f92672">,</span> ChronoUnit<span style="color:#f92672">.</span><span style="color:#a6e22e">SECONDS</span><span style="color:#f92672">)</span><span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span>ChronoUnit<span style="color:#f92672">.</span><span style="color:#a6e22e">MILLIS</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span>
+</code></pre></div><p>Looks pretty good, no? It’s quite explicit about what values are used and about the units they have. Not so fast. A
+RuntimeException in the logs.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">java<span style="color:#f92672">.</span><span style="color:#a6e22e">time</span><span style="color:#f92672">.</span><span style="color:#a6e22e">temporal</span><span style="color:#f92672">.</span><span style="color:#a6e22e">UnsupportedTemporalTypeException</span><span style="color:#f92672">:</span> Unsupported unit<span style="color:#f92672">:</span> Millis
+</code></pre></div><p>Surely, that must be some kind of silly error on my side. A quick check with the
+<a href="https://docs.oracle.com/javase/10/docs/api/java/time/Duration.html#get(java.time.temporal.TemporalUnit)">documentation</a>
+confirmed that it was much, much worse. It says, and I kid you not,</p>
+<blockquote>
+<p>This returns a value for each of the two supported units, SECONDS and NANOS. All other units throw an exception.</p>
+</blockquote>
+<p>This cannot be real. IT CANNOT BE REALLY SAYING WHAT IT SAYS. But it does. Here’s a screenshot:
+̦</p>
+<p><img src="/img/screenshot-date-api.png" alt="Screnshot From JavaDoc"></p>
+<h2 id="api-design-at-its-finest">API Design at it’s finest</h2>
+<p>So somebody, actually multiple people, looked at the proposal and said,</p>
+<blockquote>
+<p>why, yes, let this API accept only 2 units and throw exceptions otherwise. That, right here, is an API worthy of
+bringing into our specification.</p>
+</blockquote>
+<p>And that’s why, folks, we cannot have nice APIs, not even now, in <strong>2000-freaking-18.</strong> But wait, I have another goodie
+for you. Maybe you saw it already: Calling this method might throw 2 different exceptions:</p>
+<blockquote>
+<p>Throws: DateTimeException – if the unit is not supported UnsupportedTemporalTypeException – if the unit is not
+supported</p>
+</blockquote>
+<p>Um, which will it throw? Anyway, Duration <em>is actually able to do the conversion</em> I required.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">Duration<span style="color:#f92672">.</span><span style="color:#a6e22e">of</span><span style="color:#f92672">(</span>90<span style="color:#f92672">,</span> ChronoUnit<span style="color:#f92672">.</span><span style="color:#a6e22e">SECONDS</span><span style="color:#f92672">)</span><span style="color:#f92672">.</span><span style="color:#a6e22e">toMillis</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+</code></pre></div><p>So if you wanted to convert dynamically, you are required to write a big switch statement or a freaking if-cascade.</p>
+
+            </div>
+        </article>
+
+        <hr />
+
+        <div class="post-info">
+                <p>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://d53dev.net/tags/untagged">untagged</a></span>
+                </p>
+
+            <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>401 Words</p>
+
+            <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2018-06-21 00:00 &#43;0200</p>
+        </div>
+
+        
+
+        
+    </main>
+
+            </div>
+
+            
+                <footer class="footer">
+    <div class="footer__inner">
+        <div class="footer__content">
+            <span>&copy; 2020</span>
+            
+            <span><a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></span>
+            <span> <a href="https://d53dev.net/posts/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a></span>
+        </div>
+    </div>
+    <div class="footer__inner">
+        <div class="footer__content">
+            <span>Powered by <a href="http://gohugo.io">Hugo</a></span>
+            <span>Made with &#10084; by <a href="https://github.com/rhazdon">rhazdon</a></span>
+        </div>
+    </div>
+</footer>
+
+            
+        </div>
+
+        
+
+
+
+
+<script type="text/javascript" src="/bundle.min.2d5469329143160ae2456a69c3c76dc2d0a3b212b46afe291a51bd68650ed6f8697e001dab54f1c272c77ce08092a8c55e5bb4314e0ee334aab4b927ec896638.js" integrity="sha512-LVRpMpFDFgriRWppw8dtwtCjshK0av4pGlG9aGUO1vhpfgAdq1TxwnLHfOCAkqjFXlu0MU4O4zSqtLkn7IlmOA=="></script>
+
+
+
+    </body>
+</html>

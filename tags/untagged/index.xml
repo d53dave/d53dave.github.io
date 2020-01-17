@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>untagged on Off The Point</title>
+    <link>https://d53dev.net/tags/untagged/</link>
+    <description>Recent content in untagged on Off The Point</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
+    <lastBuildDate>Wed, 20 Jun 2018 23:00:11 +0100</lastBuildDate>
+    
+	<atom:link href="https://d53dev.net/tags/untagged/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>The &#34;new&#34; Java 8 date API is still a mess</title>
+      <link>https://d53dev.net/posts/2018/06/the-new-java-8-date-api-is-still-a-mess/</link>
+      <pubDate>Wed, 20 Jun 2018 23:00:11 +0100</pubDate>
+      
+      <guid>https://d53dev.net/posts/2018/06/the-new-java-8-date-api-is-still-a-mess/</guid>
+      <description>Do you remember how everybody was hyped about the new date and time APIs introduced in Java 8? Yes, I was hyped too, although I was using jodatime wherever I could anyway. Now this was a while back and at the time of this writing, Java 10 is out and the latest (or at least a fairly current) release is
+java version &amp;quot;10.0.1&amp;quot; 2018-04-17 Java(TM) SE Runtime Environment 18.3 (build 10.</description>
+    </item>
+    
+  </channel>
+</rss>
