@@ -28,7 +28,17 @@
   </url>
   
   <url>
-    <loc>https://d53dev.net/tags/linux-macos-development/</loc>
+    <loc>https://d53dev.net/tags/development/</loc>
+    <lastmod>2018-03-28T22:07:08+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://d53dev.net/tags/linux/</loc>
+    <lastmod>2018-03-28T22:07:08+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://d53dev.net/tags/macos/</loc>
     <lastmod>2018-03-28T22:07:08+01:00</lastmod>
   </url>
   

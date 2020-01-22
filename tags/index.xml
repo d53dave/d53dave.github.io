@@ -22,11 +22,29 @@
     </item>
     
     <item>
-      <title>linux, macos, development</title>
-      <link>https://d53dev.net/tags/linux-macos-development/</link>
+      <title>development</title>
+      <link>https://d53dev.net/tags/development/</link>
       <pubDate>Wed, 28 Mar 2018 22:07:08 +0100</pubDate>
       
-      <guid>https://d53dev.net/tags/linux-macos-development/</guid>
+      <guid>https://d53dev.net/tags/development/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>linux</title>
+      <link>https://d53dev.net/tags/linux/</link>
+      <pubDate>Wed, 28 Mar 2018 22:07:08 +0100</pubDate>
+      
+      <guid>https://d53dev.net/tags/linux/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>macos</title>
+      <link>https://d53dev.net/tags/macos/</link>
+      <pubDate>Wed, 28 Mar 2018 22:07:08 +0100</pubDate>
+      
+      <guid>https://d53dev.net/tags/macos/</guid>
       <description></description>
     </item>
     

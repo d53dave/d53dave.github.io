@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>development on Off The Point</title>
+    <link>https://d53dev.net/tags/development/</link>
+    <description>Recent content in development on Off The Point</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
+    <lastBuildDate>Wed, 28 Mar 2018 22:07:08 +0100</lastBuildDate>
+    
+	<atom:link href="https://d53dev.net/tags/development/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Using ElementaryOS Professionally</title>
+      <link>https://d53dev.net/posts/2018/03/using-elementaryos-professionally/</link>
+      <pubDate>Wed, 28 Mar 2018 22:07:08 +0100</pubDate>
+      
+      <guid>https://d53dev.net/posts/2018/03/using-elementaryos-professionally/</guid>
+      <description>My employer agreed on buying me a new and shiny MacBook Pro, so I thought it’s a good time to reflect on my experiences with using ElementaryOS (Freya) professionally daily driver for almost a year.
+TL;DR I mostly enjoyed the ride. Elementary is fast, polished, functional and has outstanding multi-monitor support. On the other hand, it’s still a Linux and the desktop experience is not nearly as polished as on MacOS and Windows.</description>
+    </item>
+    
+  </channel>
+</rss>
