@@ -62,5 +62,80 @@ supported</p>
 ]]></content>
         </item>
         
+        <item>
+            <title>Using ElementaryOS Professionally</title>
+            <link>https://d53dev.net/posts/2018/03/using-elementaryos-professionally/</link>
+            <pubDate>Wed, 28 Mar 2018 22:07:08 +0100</pubDate>
+            
+            <guid>https://d53dev.net/posts/2018/03/using-elementaryos-professionally/</guid>
+            <description>My employer agreed on buying me a new and shiny MacBook Pro, so I thought it’s a good time to reflect on my experiences with using ElementaryOS (Freya) professionally daily driver for almost a year.
+TL;DR I mostly enjoyed the ride. Elementary is fast, polished, functional and has outstanding multi-monitor support. On the other hand, it’s still a Linux and the desktop experience is not nearly as polished as on MacOS and Windows.</description>
+            <content type="html"><![CDATA[<p><img src="/img/elementary.png" alt="Screnshot From JavaDoc"></p>
+<p>My employer agreed on buying me a new and shiny MacBook Pro, so I thought it’s
+a good time to reflect on my experiences with using ElementaryOS (Freya)
+professionally daily driver for almost a year.</p>
+<h2 id="tldr">TL;DR</h2>
+<p>I mostly enjoyed the ride. Elementary is fast, polished, functional and has
+outstanding multi-monitor support. On the other hand, it’s still a Linux and
+the desktop experience is not nearly as polished as on MacOS and Windows.</p>
+<h2 id="the-good">The Good</h2>
+<p>The installation worked flawlessly on my Thinkpad T460p (vPro branded Core
+i5-6440HQ, 16GB RAM, 256GB SSD, integrated Intel HD 530), and I didn't have to
+chase any drivers.</p>
+<p>At the time of this writing, the current version &ldquo;Freya&rdquo; is
+based off of Ubuntu 16.04, so the internals should be familiar to all you Ubuntu
+fanboys (like me). Power users might sometimes run into trouble because
+<code>uname -r</code> doesn't return <code>xenial</code>, it returns <code>freya</code>, so anything that relies
+on that, like apt repositories, need manual intervention.</p>
+<p>All my favourite IDEs (IDEA and VSCode) worked without any issues and with good
+performance.</p>
+<p>The overall look-and-feel of ElementaryOS is very nice. Some would even call it
+polished, but I wouldn't go so far just yet. It's definitely the most
+aesthetically pleasing Linux desktop I know, but it still has some rough edges
+here and there.</p>
+<p>The built-in apps are functional and pretty, albeit somewhat bare-bones. I will
+discuss this in the next section in more detail.</p>
+<p>The one thing that took me by surprise was the outstanding multi-monitor
+support. I was using 2 external screens, one via HDMI and the other via
+DisplayPort (remember the times where laptops still had all kinds of different
+connectors?) together with the internal screen and ElementaryOS handled it just
+fine. It worked flawlessly with all TVs and projectors I ever connected it to,
+and it out-performed most Windows-based laptops in terms of compatibility. I
+know this is partly due to the well-crafted hardware of the Thinkpad, but it
+worked better than other similar Thinkpads running Windows, at least in my
+office environment.</p>
+<p>One thing that is much nicer on Linux than on MacOS is the Docker integration.
+That's not a feature of ElementaryOS but it is still a strong point, in my book.
+MacOS doesn’t have access to the docker bridge, so you cannot access containers
+directly – only through published ports (or by monkey-patching docker, which
+somehow hardcodes this network config). This also means that you need to
+dockerize any application that needs to talk to any other dockerized app
+directly, which lead to quite some overhead in the beginning.</p>
+<h2 id="the-bad">The Bad</h2>
+<p>The &ldquo;AppCenter&rdquo; has not yet reached critical mass, meaning that proper
+applications are few and far in-between. Most paid apps were not worth their
+price, in my opinion. I'm not sure that there is enough interest to ever make
+AppCenter a platform worthy of broad adoption, and the 70/30 (but at least
+50ct) platform fee is a bit steep for a platform with such a niche target
+demographic (i.e. people willing to install a GNU/Linux desktop,
+a free, as in beer, product AND willing to pay for apps in an app store).</p>
+<p>The built-in apps, such as Mail and Calendar, are forks of other popular
+open-source projects that now implement the ElementaryOS look and feel, but are
+rather limited in functionality. For the most part, they work fine, but you
+might be out of luck if you require more advanced settings or customization. In
+my case, the calendar was incompatible with my company email system and there
+was no way to make it work.</p>
+<p>This leads me to the next point: the look-and-feel, though very nice, only works
+for apps developed for ElementaryOS specifically. Other GTK+ or Qt apps will
+look and behave differently.</p>
+<h2 id="the-ugly">The Ugly</h2>
+<p>At times, the configuration of wingpanel would get corrupted. This would happen
+with or without my direct interaction, e.g., after removing or updating
+applications or libraries. The effect was that the top bar and the app launcher
+menu were either frozen or would disappear completely. A forensic cat-and-mouse
+game ensued trying to find the reason for the mess.</p>
+]]></content>
+        </item>
+        
     </channel>
 </rss>
