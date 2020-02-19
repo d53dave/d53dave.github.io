@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author" content="">
+<meta name="description" content="or &amp;ldquo;how to not be stupid with your inserts&amp;rdquo; I&#39;m working on a small side project where I&#39;m consuming public listing data from an API for fun and profit. The API will allow me to GET the newest items corresponding to a specific query, and paginates at a maximum page size of 50.
+I store all listings that I&#39;ve already seen in Postgres for later analysis but due to the nature of the API, I&#39;m unable to pull only new listings and have to resort to somehow decide whether or not I should continue paginating." />
+<meta name="keywords" content="software engineering, computer science, programming" />
+<meta name="robots" content="noodp" />
+<meta name="theme-color" content="" />
+<link rel="canonical" href="https://d53dev.net/posts/2020/02/how-to-speed-up-database-inserts-with-many-duplicates/" />
+
+
+    <title>
+        
+            How to speed up database inserts with many duplicates :: Off The Point  — human engineer musician
+        
+    </title>
+
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.2.1/css/flag-icon.min.css" rel="stylesheet"
+    type="text/css">
+
+
+
+<link rel="stylesheet" href="/main.min.5dcefbf8102eb536dd3e2de53ffebfa58599ab2435c241a0db81728a5e015f2e.css">
+
+
+    
+        <link rel="stylesheet" type="text/css" href="https://d53dev.net/css/centering.css">
+    
+
+
+
+<meta itemprop="name" content="How to speed up database inserts with many duplicates">
+<meta itemprop="description" content="or &ldquo;how to not be stupid with your inserts&rdquo; I&#39;m working on a small side project where I&#39;m consuming public listing data from an API for fun and profit. The API will allow me to GET the newest items corresponding to a specific query, and paginates at a maximum page size of 50.
+I store all listings that I&#39;ve already seen in Postgres for later analysis but due to the nature of the API, I&#39;m unable to pull only new listings and have to resort to somehow decide whether or not I should continue paginating.">
+<meta itemprop="datePublished" content="2020-02-19T07:42:22&#43;01:00" />
+<meta itemprop="dateModified" content="2020-02-19T07:42:22&#43;01:00" />
+<meta itemprop="wordCount" content="811">
+<meta itemprop="image" content="https://d53dev.net/"/>
+
+
+
+<meta itemprop="keywords" content="python,postgres,databases,scraping,asyncio,asyncpg," /><meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://d53dev.net/"/>
+
+<meta name="twitter:title" content="How to speed up database inserts with many duplicates"/>
+<meta name="twitter:description" content="or &ldquo;how to not be stupid with your inserts&rdquo; I&#39;m working on a small side project where I&#39;m consuming public listing data from an API for fun and profit. The API will allow me to GET the newest items corresponding to a specific query, and paginates at a maximum page size of 50.
+I store all listings that I&#39;ve already seen in Postgres for later analysis but due to the nature of the API, I&#39;m unable to pull only new listings and have to resort to somehow decide whether or not I should continue paginating."/>
+
+
+
+
+
+    <meta property="article:published_time" content="2020-02-19 07:42:22 &#43;0100 CET" />
+
+
+
+
+
+
+
+
+    </head>
+
+    <body class="dark-theme">
+        <div class="container">
+            <header class="header">
+    <span class="header__inner">
+        <a href="/" style="text-decoration: none;">
+    <div class="logo">
+        
+            <span class="logo__mark">></span>
+            <span class="logo__text">./off-the-point.sh</span>
+            <span class="logo__cursor" style=""></span>
+        
+    </div>
+</a>
+
+
+        <span class="header__right">
+            
+                <nav class="menu">
+    <ul class="menu__inner"><li><a href="https://d53dev.net/posts">Blog</a></li>
+    </ul>
+</nav>
+
+                <span class="menu-trigger">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                    </svg>
+                </span>
+            
+
+            <span class="theme-toggle unselectable"><svg class="theme-toggler" width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M22 41C32.4934 41 41 32.4934 41 22C41 11.5066 32.4934 3 22
+  3C11.5066 3 3 11.5066 3 22C3 32.4934 11.5066 41 22 41ZM7 22C7
+  13.7157 13.7157 7 22 7V37C13.7157 37 7 30.2843 7 22Z"/>
+</svg>
+</span>
+        </span>
+    </span>
+</header>
+
+
+            <div class="content">
+                
+    <main class="post">
+
+        <div class="post-info">
+            <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>4 minutes
+
+            
+
+            </p>
+        </div>
+
+        <article>
+            <h1 class="post-title">
+                <a href="https://d53dev.net/posts/2020/02/how-to-speed-up-database-inserts-with-many-duplicates/">How to speed up database inserts with many duplicates</a>
+            </h1>
+
+            
+
+            <div class="post-content">
+                <h2 id="or-how-to-not-be-stupid-with-your-inserts">or &ldquo;how to not be stupid with your inserts&rdquo;</h2>
+<p>I'm working on a small side project where I'm consuming public listing data from
+an API for fun and profit. The API will allow me to <code>GET</code> the newest items
+corresponding to a specific query, and paginates at a maximum page size of 50.</p>
+<p>I store all listings that I've already seen in Postgres for later analysis but
+due to the nature of the API, I'm unable to pull only new listings and have to
+resort to somehow decide whether or not I should continue paginating.</p>
+<p>Since I'm quite comfortable and productive with Python, I've implemented this as
+an <code>APScheduler</code> job, which will run at a given interval, say, every 10 minutes.
+Upon startup, the job will pull the first page of new listings, persist them and
+count how many duplicates it encountered. I decided that it was good enough™ to
+stop getting new pages whenever a full page of duplicate listings was
+encountered. I acknowledge that this is not the most robust design, especially
+when there are many new pages to be pulled and errors occur somewhere in the
+middle of the pagination. It might also miss a small number of listings around
+edge cases, but I found this to be negligible so far.</p>
+<h2 id="sequential-inserts-are-bad">Sequential inserts are bad</h2>
+<p>So far so good. I wanted to get off the ground quickly so instead of thinking
+of a proper way of checking for duplicates, I would just do a sequential insert
+and catch the specific error thrown when duplicates are encountered:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">for</span> listing <span style="color:#f92672">in</span> listings:
+  <span style="color:#66d9ef">try</span>:
+    await connection<span style="color:#f92672">.</span>execute(
+      <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">INSERT INTO listings (a, b, c) VALUES ($1, $2, $3)</span><span style="color:#e6db74">&#39;</span>, listing<span style="color:#f92672">.</span>a, listing<span style="color:#f92672">.</span>b, listing<span style="color:#f92672">.</span>c)
+  <span style="color:#66d9ef">except</span> asyncpg<span style="color:#f92672">.</span>exceptions<span style="color:#f92672">.</span>UniqueViolationError:
+      duplicates<span style="color:#f92672">.</span>append(listing)
+        <span style="color:#66d9ef">continue</span>
+</code></pre></div><p>I mean, it's not pretty, but it works, right? Well, it did for the first
+prototype but after the project grew a bit, I realized that I'm wasting
+resources on the service, on the network and the database. The service tries to
+persist a listing that is already present, which will fail, but in this process,
+data needs to be serialized, put on the wire, deserialized on the DB, checked
+against constraints and finally a response with an appropriate error code needs
+to go back to the service which is now handling an error case that is not a real
+error case.</p>
+<p>Logs looked something like this:</p>
+<pre><code class="language-;" data-lang=";">2020-02-17 09:17:18 INFO API GET took 6820.19 ms. Insert took 40122.35 ms and inserted 41 listings.
+2020-02-17 09:22:28 INFO API GET took 6130.07 ms. Insert took 42001.81 ms and inserted 0 listings.
+2020-02-17 09:22:28 INFO Found full page of duplicates. Exiting!
+</code></pre><h2 id="finding-a-smarter-way-to-insert">Finding a smarter way to insert</h2>
+<p>Since I'm running this on cheap VPSs, I don't want to waste resources, which are
+scarce from the get-go. The logs suggest that it takes around one full second
+for an insert per listing, whether or not that listing is eventually inserted.
+Inserting 50 listings takes the same amount of time as inserting none, which is
+obviously and utterly 💩. So after thinking about a better solution, I came to
+the realization that I can do a quick and relatively cheap membership check
+using the IDs of the listings I want to persist since they are primary keys and
+have an index by default.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">listing_ids <span style="color:#f92672">=</span> tuple(map(<span style="color:#66d9ef">lambda</span> l: l<span style="color:#f92672">.</span>id, listings))
+
+duplicate_ids <span style="color:#f92672">=</span> await connection<span style="color:#f92672">.</span>fetch(
+    <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">SELECT id from listings WHERE id = any($1::int8[])</span><span style="color:#e6db74">&#39;</span>,
+    listing_ids)
+</code></pre></div><p>which now allows me to write the insert code without catching <code>UniqueViolationError</code> and to use <code>connection.executemany</code>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">non_duplicate_listings <span style="color:#f92672">=</span> list(
+    filter(<span style="color:#66d9ef">lambda</span> l: l<span style="color:#f92672">.</span>id <span style="color:#f92672">not</span> <span style="color:#f92672">in</span> duplicate_ids, listings))
+
+insert_tuples <span style="color:#f92672">=</span> list(
+    map(<span style="color:#66d9ef">lambda</span> l: l<span style="color:#f92672">.</span>to_insertable_tuple(), non_duplicate_listings))
+
+await connection<span style="color:#f92672">.</span>executemany(
+    <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">INSERT INTO listings (a, b, c) VALUES ($1, $2, $3)</span><span style="color:#e6db74">&#39;</span>, insert_tuples)
+
+</code></pre></div><p>Besides the fact that this feels much cleaner (and as a consequence, I don't
+feel like I need a shower after working with this service), the logs prove that
+it has been a good idea.</p>
+<h3 id="results">Results</h3>
+<p>Let's look at some cold hard data from the new version of the code:</p>
+<pre><code class="language-;" data-lang=";">2020-02-18 06:31:13 INFO API GET took 7022.19 ms. Insert took 6280.75 ms and inserted 39 listings.
+2020-02-18 06:31:04 INFO API GET took 6446.77 ms. Insert took 235.86 ms and inserted 0 listings.
+2020-02-18 06:31:04 INFO Found first page full of duplicates, exiting.
+</code></pre><p>Inserting listings is now much faster, as many inserts can happen in one go, and
+not in a separate round-trip insert statement for each listing. Average insert
+time per listing went down from around <code>1000ms</code> to around <code>160ms</code>, which is an
+improvement of <code>6x</code>. Dealing with pages full of duplicate listings became
+significantly faster as well because it can stop after determining that all IDs
+are already present in the database. It improved from 40-ish seconds to just
+<code>235ms</code> or by a factor of 170, yes, freaking <code>170x</code>.</p>
+<p><img src="/img/boom.gif#center" alt="Boom!"></p>
+<p>All in all, I am satisfied with my refactoring. Who could have thunk that doing
+things in a smarter way would lead to better results?</p>
+
+            </div>
+        </article>
+
+        <hr />
+
+        <div class="post-info">
+                <p>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://d53dev.net/tags/python">python</a></span><span class="tag"><a href="https://d53dev.net/tags/postgres">postgres</a></span><span class="tag"><a href="https://d53dev.net/tags/databases">databases</a></span><span class="tag"><a href="https://d53dev.net/tags/scraping">scraping</a></span><span class="tag"><a href="https://d53dev.net/tags/asyncio">asyncio</a></span><span class="tag"><a href="https://d53dev.net/tags/asyncpg">asyncpg</a></span>
+                </p>
+
+            <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>811 Words</p>
+
+            <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2020-02-19 07:42 &#43;0100</p>
+        </div>
+
+        
+            <div class="pagination">
+                <div class="pagination__title">
+                    <span class="pagination__title-h">Read other posts</span>
+                    <hr />
+                </div>
+
+                <div class="pagination__buttons">
+                    
+
+                    
+                        <span class="button next">
+                            <a href="https://d53dev.net/posts/2018/06/the-new-java-8-date-api-is-still-a-mess/">
+                                <span class="button__text">The &#34;new&#34; Java 8 date API is still a mess</span>
+                                <span class="button__icon">→</span>
+                            </a>
+                        </span>
+                    
+                </div>
+            </div>
+        
+
+        
+    </main>
+
+            </div>
+
+            
+                <footer class="footer">
+    <div class="footer__inner">
+        <div class="footer__content">
+            <span>&copy; 2020</span>
+            
+            <span><a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></span>
+            <span> <a href="https://d53dev.net/posts/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a></span>
+        </div>
+    </div>
+    <div class="footer__inner">
+        <div class="footer__content">
+            <span>Powered by <a href="http://gohugo.io">Hugo</a></span>
+            <span>Made with &#10084; by <a href="https://github.com/rhazdon">rhazdon</a></span>
+        </div>
+    </div>
+</footer>
+
+            
+        </div>
+
+        
+
+
+
+
+<script type="text/javascript" src="/bundle.min.2d5469329143160ae2456a69c3c76dc2d0a3b212b46afe291a51bd68650ed6f8697e001dab54f1c272c77ce08092a8c55e5bb4314e0ee334aab4b927ec896638.js" integrity="sha512-LVRpMpFDFgriRWppw8dtwtCjshK0av4pGlG9aGUO1vhpfgAdq1TxwnLHfOCAkqjFXlu0MU4O4zSqtLkn7IlmOA=="></script>
+
+
+
+    </body>
+</html>

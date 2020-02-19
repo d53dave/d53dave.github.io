@@ -3,18 +3,53 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://d53dev.net/tags/asyncio/</loc>
+    <lastmod>2020-02-19T07:42:22+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://d53dev.net/tags/asyncpg/</loc>
+    <lastmod>2020-02-19T07:42:22+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://d53dev.net/tags/databases/</loc>
+    <lastmod>2020-02-19T07:42:22+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://d53dev.net/posts/2020/02/how-to-speed-up-database-inserts-with-many-duplicates/</loc>
+    <lastmod>2020-02-19T07:42:22+01:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://d53dev.net/</loc>
-    <lastmod>2018-06-20T23:00:11+01:00</lastmod>
+    <lastmod>2020-02-19T07:42:22+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://d53dev.net/tags/postgres/</loc>
+    <lastmod>2020-02-19T07:42:22+01:00</lastmod>
   </url>
   
   <url>
     <loc>https://d53dev.net/posts/</loc>
-    <lastmod>2018-06-20T23:00:11+01:00</lastmod>
+    <lastmod>2020-02-19T07:42:22+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://d53dev.net/tags/python/</loc>
+    <lastmod>2020-02-19T07:42:22+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://d53dev.net/tags/scraping/</loc>
+    <lastmod>2020-02-19T07:42:22+01:00</lastmod>
   </url>
   
   <url>
     <loc>https://d53dev.net/tags/</loc>
-    <lastmod>2018-06-20T23:00:11+01:00</lastmod>
+    <lastmod>2020-02-19T07:42:22+01:00</lastmod>
   </url>
   
   <url>

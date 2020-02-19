@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>databases on Off The Point</title>
+    <link>https://d53dev.net/tags/databases/</link>
+    <description>Recent content in databases on Off The Point</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
+    <lastBuildDate>Wed, 19 Feb 2020 07:42:22 +0100</lastBuildDate>
+    
+	<atom:link href="https://d53dev.net/tags/databases/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>How to speed up database inserts with many duplicates</title>
+      <link>https://d53dev.net/posts/2020/02/how-to-speed-up-database-inserts-with-many-duplicates/</link>
+      <pubDate>Wed, 19 Feb 2020 07:42:22 +0100</pubDate>
+      
+      <guid>https://d53dev.net/posts/2020/02/how-to-speed-up-database-inserts-with-many-duplicates/</guid>
+      <description>or &amp;ldquo;how to not be stupid with your inserts&amp;rdquo; I&#39;m working on a small side project where I&#39;m consuming public listing data from an API for fun and profit. The API will allow me to GET the newest items corresponding to a specific query, and paginates at a maximum page size of 50.
+I store all listings that I&#39;ve already seen in Postgres for later analysis but due to the nature of the API, I&#39;m unable to pull only new listings and have to resort to somehow decide whether or not I should continue paginating.</description>
+    </item>
+    
+  </channel>
+</rss>

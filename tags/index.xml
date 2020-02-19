@@ -7,10 +7,64 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-    <lastBuildDate>Wed, 20 Jun 2018 23:00:11 +0100</lastBuildDate>
+    <lastBuildDate>Wed, 19 Feb 2020 07:42:22 +0100</lastBuildDate>
     
 	<atom:link href="https://d53dev.net/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>asyncio</title>
+      <link>https://d53dev.net/tags/asyncio/</link>
+      <pubDate>Wed, 19 Feb 2020 07:42:22 +0100</pubDate>
+      
+      <guid>https://d53dev.net/tags/asyncio/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>asyncpg</title>
+      <link>https://d53dev.net/tags/asyncpg/</link>
+      <pubDate>Wed, 19 Feb 2020 07:42:22 +0100</pubDate>
+      
+      <guid>https://d53dev.net/tags/asyncpg/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>databases</title>
+      <link>https://d53dev.net/tags/databases/</link>
+      <pubDate>Wed, 19 Feb 2020 07:42:22 +0100</pubDate>
+      
+      <guid>https://d53dev.net/tags/databases/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>postgres</title>
+      <link>https://d53dev.net/tags/postgres/</link>
+      <pubDate>Wed, 19 Feb 2020 07:42:22 +0100</pubDate>
+      
+      <guid>https://d53dev.net/tags/postgres/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>python</title>
+      <link>https://d53dev.net/tags/python/</link>
+      <pubDate>Wed, 19 Feb 2020 07:42:22 +0100</pubDate>
+      
+      <guid>https://d53dev.net/tags/python/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>scraping</title>
+      <link>https://d53dev.net/tags/scraping/</link>
+      <pubDate>Wed, 19 Feb 2020 07:42:22 +0100</pubDate>
+      
+      <guid>https://d53dev.net/tags/scraping/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>untagged</title>

@@ -6,8 +6,100 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>en-us</language>
         <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-        <lastBuildDate>Wed, 20 Jun 2018 23:00:11 +0100</lastBuildDate>
+        <lastBuildDate>Wed, 19 Feb 2020 07:42:22 +0100</lastBuildDate>
         <atom:link href="https://d53dev.net/posts/index.xml" rel="self" type="application/rss+xml" />
+        
+        <item>
+            <title>How to speed up database inserts with many duplicates</title>
+            <link>https://d53dev.net/posts/2020/02/how-to-speed-up-database-inserts-with-many-duplicates/</link>
+            <pubDate>Wed, 19 Feb 2020 07:42:22 +0100</pubDate>
+            
+            <guid>https://d53dev.net/posts/2020/02/how-to-speed-up-database-inserts-with-many-duplicates/</guid>
+            <description>or &amp;ldquo;how to not be stupid with your inserts&amp;rdquo; I&#39;m working on a small side project where I&#39;m consuming public listing data from an API for fun and profit. The API will allow me to GET the newest items corresponding to a specific query, and paginates at a maximum page size of 50.
+I store all listings that I&#39;ve already seen in Postgres for later analysis but due to the nature of the API, I&#39;m unable to pull only new listings and have to resort to somehow decide whether or not I should continue paginating.</description>
+            <content type="html"><![CDATA[<h2 id="or-how-to-not-be-stupid-with-your-inserts">or &ldquo;how to not be stupid with your inserts&rdquo;</h2>
+<p>I'm working on a small side project where I'm consuming public listing data from
+an API for fun and profit. The API will allow me to <code>GET</code> the newest items
+corresponding to a specific query, and paginates at a maximum page size of 50.</p>
+<p>I store all listings that I've already seen in Postgres for later analysis but
+due to the nature of the API, I'm unable to pull only new listings and have to
+resort to somehow decide whether or not I should continue paginating.</p>
+<p>Since I'm quite comfortable and productive with Python, I've implemented this as
+an <code>APScheduler</code> job, which will run at a given interval, say, every 10 minutes.
+Upon startup, the job will pull the first page of new listings, persist them and
+count how many duplicates it encountered. I decided that it was good enough™ to
+stop getting new pages whenever a full page of duplicate listings was
+encountered. I acknowledge that this is not the most robust design, especially
+when there are many new pages to be pulled and errors occur somewhere in the
+middle of the pagination. It might also miss a small number of listings around
+edge cases, but I found this to be negligible so far.</p>
+<h2 id="sequential-inserts-are-bad">Sequential inserts are bad</h2>
+<p>So far so good. I wanted to get off the ground quickly so instead of thinking
+of a proper way of checking for duplicates, I would just do a sequential insert
+and catch the specific error thrown when duplicates are encountered:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">for</span> listing <span style="color:#f92672">in</span> listings:
+  <span style="color:#66d9ef">try</span>:
+    await connection<span style="color:#f92672">.</span>execute(
+      <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">INSERT INTO listings (a, b, c) VALUES ($1, $2, $3)</span><span style="color:#e6db74">&#39;</span>, listing<span style="color:#f92672">.</span>a, listing<span style="color:#f92672">.</span>b, listing<span style="color:#f92672">.</span>c)
+  <span style="color:#66d9ef">except</span> asyncpg<span style="color:#f92672">.</span>exceptions<span style="color:#f92672">.</span>UniqueViolationError:
+      duplicates<span style="color:#f92672">.</span>append(listing)
+        <span style="color:#66d9ef">continue</span>
+</code></pre></div><p>I mean, it's not pretty, but it works, right? Well, it did for the first
+prototype but after the project grew a bit, I realized that I'm wasting
+resources on the service, on the network and the database. The service tries to
+persist a listing that is already present, which will fail, but in this process,
+data needs to be serialized, put on the wire, deserialized on the DB, checked
+against constraints and finally a response with an appropriate error code needs
+to go back to the service which is now handling an error case that is not a real
+error case.</p>
+<p>Logs looked something like this:</p>
+<pre><code class="language-;" data-lang=";">2020-02-17 09:17:18 INFO API GET took 6820.19 ms. Insert took 40122.35 ms and inserted 41 listings.
+2020-02-17 09:22:28 INFO API GET took 6130.07 ms. Insert took 42001.81 ms and inserted 0 listings.
+2020-02-17 09:22:28 INFO Found full page of duplicates. Exiting!
+</code></pre><h2 id="finding-a-smarter-way-to-insert">Finding a smarter way to insert</h2>
+<p>Since I'm running this on cheap VPSs, I don't want to waste resources, which are
+scarce from the get-go. The logs suggest that it takes around one full second
+for an insert per listing, whether or not that listing is eventually inserted.
+Inserting 50 listings takes the same amount of time as inserting none, which is
+obviously and utterly 💩. So after thinking about a better solution, I came to
+the realization that I can do a quick and relatively cheap membership check
+using the IDs of the listings I want to persist since they are primary keys and
+have an index by default.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">listing_ids <span style="color:#f92672">=</span> tuple(map(<span style="color:#66d9ef">lambda</span> l: l<span style="color:#f92672">.</span>id, listings))
+
+duplicate_ids <span style="color:#f92672">=</span> await connection<span style="color:#f92672">.</span>fetch(
+    <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">SELECT id from listings WHERE id = any($1::int8[])</span><span style="color:#e6db74">&#39;</span>,
+    listing_ids)
+</code></pre></div><p>which now allows me to write the insert code without catching <code>UniqueViolationError</code> and to use <code>connection.executemany</code>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">non_duplicate_listings <span style="color:#f92672">=</span> list(
+    filter(<span style="color:#66d9ef">lambda</span> l: l<span style="color:#f92672">.</span>id <span style="color:#f92672">not</span> <span style="color:#f92672">in</span> duplicate_ids, listings))
+
+insert_tuples <span style="color:#f92672">=</span> list(
+    map(<span style="color:#66d9ef">lambda</span> l: l<span style="color:#f92672">.</span>to_insertable_tuple(), non_duplicate_listings))
+
+await connection<span style="color:#f92672">.</span>executemany(
+    <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">INSERT INTO listings (a, b, c) VALUES ($1, $2, $3)</span><span style="color:#e6db74">&#39;</span>, insert_tuples)
+
+</code></pre></div><p>Besides the fact that this feels much cleaner (and as a consequence, I don't
+feel like I need a shower after working with this service), the logs prove that
+it has been a good idea.</p>
+<h3 id="results">Results</h3>
+<p>Let's look at some cold hard data from the new version of the code:</p>
+<pre><code class="language-;" data-lang=";">2020-02-18 06:31:13 INFO API GET took 7022.19 ms. Insert took 6280.75 ms and inserted 39 listings.
+2020-02-18 06:31:04 INFO API GET took 6446.77 ms. Insert took 235.86 ms and inserted 0 listings.
+2020-02-18 06:31:04 INFO Found first page full of duplicates, exiting.
+</code></pre><p>Inserting listings is now much faster, as many inserts can happen in one go, and
+not in a separate round-trip insert statement for each listing. Average insert
+time per listing went down from around <code>1000ms</code> to around <code>160ms</code>, which is an
+improvement of <code>6x</code>. Dealing with pages full of duplicate listings became
+significantly faster as well because it can stop after determining that all IDs
+are already present in the database. It improved from 40-ish seconds to just
+<code>235ms</code> or by a factor of 170, yes, freaking <code>170x</code>.</p>
+<p><img src="/img/boom.gif#center" alt="Boom!"></p>
+<p>All in all, I am satisfied with my refactoring. Who could have thunk that doing
+things in a smarter way would lead to better results?</p>
+]]></content>
+        </item>
         
         <item>
             <title>The &#34;new&#34; Java 8 date API is still a mess</title>
@@ -24,9 +116,9 @@ Java HotSpot(TM) 64-Bit Server VM 18.3 (build 10.0.1+10, mixed mode)
 </code></pre><p>so we all have even saner APIs to deal with dates and times, right? <strong>Wrong.</strong></p>
 <p><img src="https://media.giphy.com/media/3oFyDpijVlI0bSoB8Y/giphy.gif#center" alt="Vince Vaughn screaming &ldquo;erroneous&rdquo;"></p>
 <h2 id="the-unsuspecting-dev">The unsuspecting Dev</h2>
-<p>Today I was configuring some timeouts at work, and I though to myself</p>
+<p>Today I was configuring some timeouts at work, and I thought to myself</p>
 <blockquote>
-<p>Why not be really explicit about what values and units are used?</p>
+<p>Why not be explicit about what values and units are used?</p>
 </blockquote>
 <p>It is 2018 and I don’t want or need to see lines like</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">long</span> timeoutmillis <span style="color:#f92672">=</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">long</span><span style="color:#f92672">)</span> 420_000 <span style="color:#f92672">*</span> COMPANY_INTERNAL_TIME_FACTOR <span style="color:#f92672">*</span> 1e<span style="color:#f92672">-</span>3 <span style="color:#f92672">-</span> 1
@@ -41,7 +133,7 @@ confirmed that it was much, much worse. It says, and I kid you not,</p>
 <blockquote>
 <p>This returns a value for each of the two supported units, SECONDS and NANOS. All other units throw an exception.</p>
 </blockquote>
-<p>This cannot be real. IT CANNOT BE REALLY SAYING WHAT IT SAYS. But it does. Here’s a screenshot:
+<p>This cannot be real. IT CANNOT BE SAYING WHAT IT SAYS. But it does. Here’s a screenshot:
 ̦</p>
 <p><img src="/img/screenshot-date-api.png" alt="Screnshot From JavaDoc"></p>
 <h2 id="api-design-at-its-finest">API Design at it’s finest</h2>
@@ -56,7 +148,8 @@ for you. Maybe you saw it already: Calling this method might throw 2 different e
 <p>Throws: DateTimeException – if the unit is not supported UnsupportedTemporalTypeException – if the unit is not
 supported</p>
 </blockquote>
-<p>Um, which will it throw? Anyway, Duration <em>is actually able to do the conversion</em> I required.</p>
+<p>Um, which will it throw? Anyway, Duration <em>is quite able</em> to do the conversion I
+required.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">Duration<span style="color:#f92672">.</span><span style="color:#a6e22e">of</span><span style="color:#f92672">(</span>90<span style="color:#f92672">,</span> ChronoUnit<span style="color:#f92672">.</span><span style="color:#a6e22e">SECONDS</span><span style="color:#f92672">)</span><span style="color:#f92672">.</span><span style="color:#a6e22e">toMillis</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
 </code></pre></div><p>So if you wanted to convert dynamically, you are required to write a big switch statement or a freaking if-cascade.</p>
 ]]></content>

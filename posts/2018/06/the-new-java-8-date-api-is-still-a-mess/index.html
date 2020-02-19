@@ -40,7 +40,7 @@ java version &amp;quot;10.0.1&amp;quot; 2018-04-17 Java(TM) SE Runtime Environme
 java version &quot;10.0.1&quot; 2018-04-17 Java(TM) SE Runtime Environment 18.3 (build 10.">
 <meta itemprop="datePublished" content="2018-06-20T23:00:11&#43;01:00" />
 <meta itemprop="dateModified" content="2018-06-20T23:00:11&#43;01:00" />
-<meta itemprop="wordCount" content="401">
+<meta itemprop="wordCount" content="399">
 <meta itemprop="image" content="https://d53dev.net/"/>
 
 
@@ -135,9 +135,9 @@ Java HotSpot(TM) 64-Bit Server VM 18.3 (build 10.0.1+10, mixed mode)
 </code></pre><p>so we all have even saner APIs to deal with dates and times, right? <strong>Wrong.</strong></p>
 <p><img src="https://media.giphy.com/media/3oFyDpijVlI0bSoB8Y/giphy.gif#center" alt="Vince Vaughn screaming &ldquo;erroneous&rdquo;"></p>
 <h2 id="the-unsuspecting-dev">The unsuspecting Dev</h2>
-<p>Today I was configuring some timeouts at work, and I though to myself</p>
+<p>Today I was configuring some timeouts at work, and I thought to myself</p>
 <blockquote>
-<p>Why not be really explicit about what values and units are used?</p>
+<p>Why not be explicit about what values and units are used?</p>
 </blockquote>
 <p>It is 2018 and I don’t want or need to see lines like</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">long</span> timeoutmillis <span style="color:#f92672">=</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">long</span><span style="color:#f92672">)</span> 420_000 <span style="color:#f92672">*</span> COMPANY_INTERNAL_TIME_FACTOR <span style="color:#f92672">*</span> 1e<span style="color:#f92672">-</span>3 <span style="color:#f92672">-</span> 1
@@ -152,7 +152,7 @@ confirmed that it was much, much worse. It says, and I kid you not,</p>
 <blockquote>
 <p>This returns a value for each of the two supported units, SECONDS and NANOS. All other units throw an exception.</p>
 </blockquote>
-<p>This cannot be real. IT CANNOT BE REALLY SAYING WHAT IT SAYS. But it does. Here’s a screenshot:
+<p>This cannot be real. IT CANNOT BE SAYING WHAT IT SAYS. But it does. Here’s a screenshot:
 ̦</p>
 <p><img src="/img/screenshot-date-api.png" alt="Screnshot From JavaDoc"></p>
 <h2 id="api-design-at-its-finest">API Design at it’s finest</h2>
@@ -167,7 +167,8 @@ for you. Maybe you saw it already: Calling this method might throw 2 different e
 <p>Throws: DateTimeException – if the unit is not supported UnsupportedTemporalTypeException – if the unit is not
 supported</p>
 </blockquote>
-<p>Um, which will it throw? Anyway, Duration <em>is actually able to do the conversion</em> I required.</p>
+<p>Um, which will it throw? Anyway, Duration <em>is quite able</em> to do the conversion I
+required.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">Duration<span style="color:#f92672">.</span><span style="color:#a6e22e">of</span><span style="color:#f92672">(</span>90<span style="color:#f92672">,</span> ChronoUnit<span style="color:#f92672">.</span><span style="color:#a6e22e">SECONDS</span><span style="color:#f92672">)</span><span style="color:#f92672">.</span><span style="color:#a6e22e">toMillis</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
 </code></pre></div><p>So if you wanted to convert dynamically, you are required to write a big switch statement or a freaking if-cascade.</p>
 
@@ -181,7 +182,7 @@ supported</p>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://d53dev.net/tags/untagged">untagged</a></span>
                 </p>
 
-            <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>401 Words</p>
+            <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>399 Words</p>
 
             <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2018-06-21 00:00 &#43;0200</p>
         </div>
@@ -194,6 +195,13 @@ supported</p>
                 </div>
 
                 <div class="pagination__buttons">
+                    
+                        <span class="button previous">
+                            <a href="https://d53dev.net/posts/2020/02/how-to-speed-up-database-inserts-with-many-duplicates/">
+                                <span class="button__icon">←</span>
+                                <span class="button__text">How to speed up database inserts with many duplicates</span>
+                            </a>
+                        </span>
                     
 
                     
