@@ -23,6 +23,16 @@ I store all listings that I&#39;ve already seen in Postgres for later analysis b
     </item>
     
     <item>
+      <title>Migrating a Standalone Go Project from Dep to Go Mod</title>
+      <link>https://d53dev.net/posts/2019/05/migrating-a-standalone-go-project-from-dep-to-go-mod/</link>
+      <pubDate>Fri, 17 May 2019 18:09:45 +0100</pubDate>
+      
+      <guid>https://d53dev.net/posts/2019/05/migrating-a-standalone-go-project-from-dep-to-go-mod/</guid>
+      <description>This is a much shorter article than I thought it would be when I started migrating our, admittedly small, projects to go mod.
+I’ve been migrating some test infrastructure to Kubernetes at work lately and, at some stage during the process, it became clear that we needed a tiny Microservice (~300LOC with tests) to hand out unique tokens to all pods that make up one run of load testing. This is somewhat bad practice but was not avoidable due to the way our load test application worked internally.</description>
+    </item>
+    
+    <item>
       <title>The &#34;new&#34; Java 8 date API is still a mess</title>
       <link>https://d53dev.net/posts/2018/06/the-new-java-8-date-api-is-still-a-mess/</link>
       <pubDate>Wed, 20 Jun 2018 23:00:11 +0100</pubDate>

@@ -53,6 +53,31 @@
   </url>
   
   <url>
+    <loc>https://d53dev.net/tags/dependencies/</loc>
+    <lastmod>2019-05-17T18:09:45+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://d53dev.net/tags/go/</loc>
+    <lastmod>2019-05-17T18:09:45+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://d53dev.net/tags/go-dep/</loc>
+    <lastmod>2019-05-17T18:09:45+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://d53dev.net/tags/go-mod/</loc>
+    <lastmod>2019-05-17T18:09:45+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://d53dev.net/posts/2019/05/migrating-a-standalone-go-project-from-dep-to-go-mod/</loc>
+    <lastmod>2019-05-17T18:09:45+01:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://d53dev.net/posts/2018/06/the-new-java-8-date-api-is-still-a-mess/</loc>
     <lastmod>2018-06-20T23:00:11+01:00</lastmod>
   </url>

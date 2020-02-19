@@ -102,6 +102,198 @@ things in a smarter way would lead to better results?</p>
         </item>
         
         <item>
+            <title>Migrating a Standalone Go Project from Dep to Go Mod</title>
+            <link>https://d53dev.net/posts/2019/05/migrating-a-standalone-go-project-from-dep-to-go-mod/</link>
+            <pubDate>Fri, 17 May 2019 18:09:45 +0100</pubDate>
+            
+            <guid>https://d53dev.net/posts/2019/05/migrating-a-standalone-go-project-from-dep-to-go-mod/</guid>
+            <description>This is a much shorter article than I thought it would be when I started migrating our, admittedly small, projects to go mod.
+I’ve been migrating some test infrastructure to Kubernetes at work lately and, at some stage during the process, it became clear that we needed a tiny Microservice (~300LOC with tests) to hand out unique tokens to all pods that make up one run of load testing. This is somewhat bad practice but was not avoidable due to the way our load test application worked internally.</description>
+            <content type="html"><![CDATA[<p>This is a much shorter article than I thought it would be when I started
+migrating our, admittedly small, projects to <code>go mod</code>.</p>
+<p>I’ve been migrating some test infrastructure to Kubernetes at work lately and,
+at some stage during the process, it became clear that we needed a tiny
+Microservice (~300LOC with tests) to hand out unique tokens to all pods that
+make up one run of load testing. This is somewhat bad practice but was not
+avoidable due to the way our load test application worked internally. I won’t
+discuss the details of the service here but the important part was the I had
+initially decided to use Go and <code>go dep</code> for dependency management. It worked
+surprisingly well.</p>
+<p>One thing that bothered me about Go was the whole <code>$GOPATH</code> mess. I had a hard
+time understanding the reasoning behind enforcing this structure and it seemed
+outdated in 2018 (when I started these projects). Versioning was painful and all
+external packages of all dependencies were kept in the same folder (and I’ve
+seen project check those into their version control – yuck).</p>
+<p>The good news is that <code>go mod</code> allows projects to live outside <code>$GOPATH</code> and it
+improves package management a lot. For simple projects like this one, it
+eliminates package management since it scans the source files for imports and
+automatically downloads them.</p>
+<p>Another little downside before go mod was CI. Our build was pretty simple, but it still depended on dep which had to be installed on each build (because I was lazy and didn’t invest more time into setting things up) before it could pull dependencies and run tests. This is now gone as well.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>First of all, go mod was introduced as an experimental feature with go 1.11, so make sure to grab at least that version. I’m using</p>
+<pre><code class="language-;" data-lang=";">--- projects/go-dep-mod ‹master› » go version
+go version go1.12.5 darwin/amd64
+</code></pre><p>for this small demonstration.</p>
+<h2 id="getting-rid-of-dep">Getting rid of dep</h2>
+<p>Being an external dependency, the only thing to do here is to remove the Gopkg files. Starting from the project like this</p>
+<pre><code class="language-;" data-lang=";">--- projects/go-dep-mod » lt
+Permissions Size User  Date Modified Name
+drwxr-xr-x     - dsere 17 May 11:01  .
+drwxr-xr-x     - dsere 17 May 11:01  ├── counters
+.rw-r--r--  1.5k dsere 17 May 11:01  │  ├── counters.go
+.rw-r--r--  2.2k dsere 17 May 11:01  │  └── counters_test.go
+.rw-r--r--  2.0k dsere 17 May 11:01  ├── Gopkg.lock
+.rw-r--r--   741 dsere 17 May 11:01  ├── Gopkg.toml
+.rw-r--r--   851 dsere 17 May 11:01  ├── main.go
+.rw-r--r--  1.6k dsere 17 May 11:01  ├── main_test.go
+.rw-r--r--   893 dsere 17 May 11:01  └── README.md
+</code></pre><p>We can go ahead and</p>
+<pre><code class="language-;" data-lang=";">rm Gopkg*
+</code></pre><h2 id="initializing-a-go-module">Initializing a Go module</h2>
+<p>Next, we tell Go to initialize a module</p>
+<pre><code class="language-;" data-lang=";">go mod init github.com/you/go-dep-mod
+</code></pre><p>This will create 2 new files</p>
+<pre><code class="language-;" data-lang=";">--- projects/go-dep-mod » lt
+Permissions Size User  Date Modified Name
+drwxr-xr-x     - dsere 17 May 11:03  .
+drwxr-xr-x     - dsere 17 May 11:02  ├── counters
+.rw-r--r--  1.7k dsere 17 May 11:02  │  ├── counters.go
+.rw-r--r--  2.6k dsere 17 May 11:02  │  └── counters_test.go
+.rw-r--r--   570 dsere 17 May 11:03  ├── Dockerfile
+.rw-r--r--   680 dsere 17 May 11:03  ├── go.mod
+.rw-r--r--  2.1k dsere 17 May 11:03  ├── go.sum
+.rw-r--r--  1.1k dsere 17 May 11:03  ├── main.go
+.rw-r--r--  2.0k dsere 17 May 11:03  ├── main_test.go
+.rw-r--r--  1.9k dsere 17 May 11:03  └── README.md
+</code></pre><p>Let’s have a look at <code>go.mod</code></p>
+<pre><code class="language-;" data-lang=";">--- projects/go-dep-mod » bat go.mod
+───────┬──────────────────────────────────────────────────────────
+       │ File: go.mod
+───────┼──────────────────────────────────────────────────────────
+   1   │ module github.com/you/go-dep-mod
+   2   │
+   3   │ require (
+   4   │     github.com/davecgh/go-spew v1.1.0 // indirect
+   5   │     github.com/labstack/echo v3.3.5+incompatible
+   6   │     github.com/labstack/gommon v0.0.0-20180613044413-d6898124de91 // indirect
+   7   │     github.com/mattn/go-colorable v0.0.9 // indirect
+   8   │     github.com/mattn/go-isatty v0.0.4 // indirect
+   9   │     github.com/pmezard/go-difflib v1.0.0 // indirect
+  10   │     github.com/stretchr/testify v1.2.2
+  11   │     github.com/valyala/bytebufferpool v1.0.0 // indirect
+  12   │     github.com/valyala/fasttemplate v0.0.0-20170224212429-dcecefd839c4 // indirect
+  13   │     golang.org/x/crypto v0.0.0-20180608092829-8ac0e0d97ce4 // indirect
+  14   │     golang.org/x/sys v0.0.0-20181122145206-62eef0e2fa9b // indirect
+  15   │ )
+───────┴──────────────────────────────────────────────────────────
+</code></pre><p>and <code>go.sum</code></p>
+<pre><code class="language-;" data-lang=";">--- projects/go-dep-mod » bat go.sum
+───────┬──────────────────────────────────────────────────────────
+       │ File: go.sum
+───────┼──────────────────────────────────────────────────────────
+   1   │ github.com/davecgh/go-spew v1.1.0 h1:ZD&lt;truncated&gt;8=
+   2   │ github.com/davecgh/go-spew v1.1.0/go.mod h1:J7&lt;truncated&gt;38=
+   3   │ github.com/labstack/echo v3.3.5+incompatible h1:9P&lt;truncated&gt;O4=
+   4   │ github.com/labstack/echo v3.3.5+incompatible/go.mod h1:0I&lt;truncated&gt;1s=
+   5   │ github.com/labstack/gommon v0.0.0-20180613044413-d6898124de91 h1:6R2om+NMGEk=
+   6   │ github.com/labstack/gommon v0.0.0-20180613044413-d6898124de91/go.mod h1:/tj9cNJ4=
+   7   │ github.com/mattn/go-colorable v0.0.9 h1:UVL&lt;truncated&gt;4=
+   8   │ github.com/mattn/go-colorable v0.0.9/go.mod h1:9v&lt;truncated&gt;ZU=
+   9   │ github.com/mattn/go-isatty v0.0.4 h1:bnP&lt;truncated&gt;DYs=
+  10   │ github.com/mattn/go-isatty v0.0.4/go.mod h1:M+lRX&lt;truncated&gt;i4=
+  11   │ github.com/pmezard/go-difflib v1.0.0 h1:4DB&lt;truncated&gt;M=
+  12   │ github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH&lt;truncated&gt;YZ/4=
+  13   │ github.com/stretchr/testify v1.2.2 h1:bSDN&lt;truncated&gt;oJ1w=
+  14   │ github.com/stretchr/testify v1.2.2/go.mod h1:a8&lt;truncated&gt;DkUVs=
+  15   │ github.com/valyala/bytebufferpool v1.0.0 h1:GqA&lt;truncated&gt;Pw=
+  16   │ github.com/valyala/bytebufferpool v1.0.0/go.mod h1:6b&lt;truncated&gt;sc=
+  17   │ github.com/valyala/fasttemplate v0.0.0-20170224212429-dcecefd839c4 h1:gK&lt;truncated&gt;=
+  18   │ github.com/valyala/fasttemplate v0.0.0-20170224212429-dcecefd839c4/go.mod h1:fasdw=
+  19   │ golang.org/x/crypto v0.0.0-20180608092829-8ac0e0d97ce4 h1:wvi&lt;truncated&gt;I=
+  20   │ golang.org/x/crypto v0.0.0-20180608092829-8ac0e0d97ce4/go.mod h1:6S&lt;truncated&gt;4=
+  21   │ golang.org/x/sys v0.0.0-20181122145206-62eef0e2fa9b h1:MQE+LT/ABUuuvEZ+mAkup74op4=
+  22   │ golang.org/x/sys v0.0.0-20181122145206-62eef0e2fa9b/go.mod h1:STP8&lt;truncated&gt;hY=
+───────┴──────────────────────────────────────────────────────────
+</code></pre><p>So these have, in effect, the same contents as the Gopkg files that <code>dep</code> used
+before: a list of dependencies and a file containing version and checksum
+information. It’s nice that go mod identifies indirect dependencies as such in
+the <code>go.mod</code> file.</p>
+<h2 id="getting-dependencies-and-building">Getting dependencies and building</h2>
+<p>Now for the beautiful parts of this process: run <code>go mod download</code> to install
+the dependencies (<code>go mod vendor</code> if you want your dependencies into
+<code>&lt;your_dir&gt;/vendor</code>, i.e. not in the default location which is
+<code>$GOPATH/pkg/mod</code>).</p>
+<pre><code class="language-;" data-lang=";">--- projects/go-dep-mod » go mod vendor
+--- projects/go-dep-mod » lt
+Permissions Size User  Date Modified Name
+drwxr-xr-x     - dsere 17 May 11:43  .
+drwxr-xr-x     - dsere 17 May 11:02  ├── counters
+.rw-r--r--  1.7k dsere 17 May 11:02  │  ├── counters.go
+.rw-r--r--  2.6k dsere 17 May 11:02  │  └── counters_test.go
+.rw-r--r--   570 dsere 17 May 11:03  ├── Dockerfile
+.rw-r--r--   680 dsere 17 May 11:03  ├── go.mod
+.rw-r--r--  2.1k dsere 17 May 11:03  ├── go.sum
+.rw-r--r--  1.1k dsere 17 May 11:03  ├── main.go
+.rw-r--r--  2.0k dsere 17 May 11:03  ├── main_test.go
+.rw-r--r--  1.9k dsere 17 May 11:03  ├── README.md
+drwxr-xr-x     - dsere 17 May 11:43  └── vendor
+drwxr-xr-x     - dsere 17 May 11:43     ├── github.com
+drwxr-xr-x     - dsere 17 May 11:43     │  ├── davecgh
+drwxr-xr-x     - dsere 17 May 11:43     │  │  └── go-spew
+.rw-r--r--   763 dsere 17 May 11:43     │  │     ├── LICENSE
+drwxr-xr-x     - dsere 17 May 11:43     │  │     └── spew
+.rw-r--r--  5.8k dsere 17 May 11:43     │  │        ├── bypass.go
+.rw-r--r--  1.7k dsere 17 May 11:43     │  │        ├── bypasssafe.go
+.rw-r--r--   10k dsere 17 May 11:43     │  │        ├── common.go
+.rw-r--r--   12k dsere 17 May 11:43     │  │        ├── config.go
+.rw-r--r--  8.5k dsere 17 May 11:43     │  │        ├── doc.go
+.rw-r--r--   13k dsere 17 May 11:43     │  │        ├── dump.go
+.rw-r--r--   11k dsere 17 May 11:43     │  │        ├── format.go
+.rw-r--r--  6.0k dsere 17 May 11:43     │  │        └── spew.go
+
+[and many more lines]
+</code></pre><p>One thing that made me very, very happy was that dependency download can be implicit, as in, Go will notice it doesn’t have dependencies and instead of complaining, just go out and get them.</p>
+<pre><code class="language-;" data-lang=";">--- projects/go-dep-mod » rm -r vendor/
+--- projects/go-dep-mod » go test
+go: finding github.com/mattn/go-isatty v0.0.4
+go: finding github.com/mattn/go-colorable v0.0.9
+go: finding github.com/labstack/gommon v0.0.0-20180613044413-d6898124de91
+go: finding github.com/labstack/echo v3.3.5+incompatible
+go: finding github.com/valyala/bytebufferpool v1.0.0
+go: finding github.com/valyala/fasttemplate v0.0.0-20170224212429-dcecefd839c4
+go: finding github.com/davecgh/go-spew v1.1.0
+go: finding github.com/stretchr/testify v1.2.2
+go: finding golang.org/x/crypto v0.0.0-20180608092829-8ac0e0d97ce4
+go: finding golang.org/x/sys v0.0.0-20181122145206-62eef0e2fa9b
+go: finding github.com/pmezard/go-difflib v1.0.0
+go: downloading github.com/labstack/echo v3.3.5+incompatible
+go: downloading github.com/stretchr/testify v1.2.2
+go: extracting github.com/stretchr/testify v1.2.2
+go: extracting github.com/labstack/echo v3.3.5+incompatible
+go: downloading github.com/pmezard/go-difflib v1.0.0
+go: downloading github.com/davecgh/go-spew v1.1.0
+go: extracting github.com/pmezard/go-difflib v1.0.0
+go: downloading github.com/labstack/gommon v0.0.0-20180613044413-d6898124de91
+go: downloading golang.org/x/crypto v0.0.0-20180608092829-8ac0e0d97ce4
+go: extracting github.com/davecgh/go-spew v1.1.0
+go: extracting github.com/labstack/gommon v0.0.0-20180613044413-d6898124de91
+go: downloading github.com/mattn/go-isatty v0.0.4
+go: downloading github.com/mattn/go-colorable v0.0.9
+go: downloading github.com/valyala/fasttemplate v0.0.0-20170224212429-dcecefd839c4
+go: extracting github.com/mattn/go-colorable v0.0.9
+go: extracting github.com/mattn/go-isatty v0.0.4
+go: extracting github.com/valyala/fasttemplate v0.0.0-20170224212429-dcecefd839c4
+go: downloading github.com/valyala/bytebufferpool v1.0.0
+go: extracting github.com/valyala/bytebufferpool v1.0.0
+go: extracting golang.org/x/crypto v0.0.0-20180608092829-8ac0e0d97ce4
+PASS
+ok    github.com/you/go-dep-mod 0.023s
+</code></pre><p>Magical, isn’t it?</p>
+<p><img src="https://media.giphy.com/media/12NUbkX6p4xOO4/giphy.gif#center" alt="Magical"></p>
+]]></content>
+        </item>
+        
+        <item>
             <title>The &#34;new&#34; Java 8 date API is still a mess</title>
             <link>https://d53dev.net/posts/2018/06/the-new-java-8-date-api-is-still-a-mess/</link>
             <pubDate>Wed, 20 Jun 2018 23:00:11 +0100</pubDate>
